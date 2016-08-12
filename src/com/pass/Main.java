@@ -16,12 +16,14 @@ class LoginWindow extends JFrame {
     private final int SCREEN_POS_X = 500;
     private final int SCREEN_POS_Y = 250;
     private final int SCREEN_WIDTH = 300;
-    private final int SCREEN_HEIGHT = 250;
+    private final int SCREEN_HEIGHT = 280;
+    private final int COMP_GAP = 30;
 
     // Components
     private JButton btnClear, btnLogin;
     private JLabel lblHeading, lblUserId, lblPassword;
     private JTextField txtUserId, txtPassword;
+    private JPanel panelHeading, panelUserName, panelPassword, panelControls;
 
     LoginWindow(String title) {
         setTitle(title);
@@ -29,43 +31,71 @@ class LoginWindow extends JFrame {
         setMinimumSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
 
         addComponents();
-        setLayout(null); // required to stop the default Layout Manager from overriding setBounds() of components
         setVisible(true);
     }
 
     private void addComponents() {
         /*
-        * All the numbers used in setting the components' bounds are highly unintuitive and not scalable
-        * The implementation requires less code but is pain to maintain
-        * For e.g. Simply adding a new component to this design will require re-adjusting most of the components.
+        * The layout managers require a bit more code but the added code is understandable and intuitive
+        * Making a GUI change is relatively easier and all components are structured logically.
          */
+        panelHeading = new JPanel();
+        panelHeading.setLayout(new BoxLayout(panelHeading, BoxLayout.LINE_AXIS));
+        panelUserName = new JPanel();
+        panelUserName.setLayout(new BoxLayout(panelUserName, BoxLayout.LINE_AXIS));
+        panelPassword =  new JPanel();
+        panelPassword.setLayout(new BoxLayout(panelPassword, BoxLayout.LINE_AXIS));
+        panelControls = new JPanel();
+        panelControls.setLayout(new BoxLayout(panelControls, BoxLayout.LINE_AXIS));
+
         lblHeading = new JLabel("Enter Password", SwingConstants.CENTER);
-        lblHeading.setBounds(0,10,SCREEN_WIDTH - 20, 20);
 
-        lblUserId = new JLabel("User ID:");
-        lblUserId.setBounds(30,60,SCREEN_WIDTH/3, 20);
-
+        lblUserId = new JLabel("Username:");
         lblPassword = new JLabel("Password:");
-        lblPassword.setBounds(30,100,SCREEN_WIDTH/3, 20);
 
         txtUserId = new JTextField();
-        txtUserId.setBounds(SCREEN_WIDTH/3 + 50, 60, SCREEN_WIDTH/3, 20);
-
+        txtUserId.setMaximumSize(new Dimension(COMP_GAP * 3, COMP_GAP));
         txtPassword = new JPasswordField();
-        txtPassword.setBounds(SCREEN_WIDTH/3 + 50, 100, SCREEN_WIDTH/3, 20);
+        txtPassword.setMaximumSize(new Dimension(COMP_GAP * 3, COMP_GAP));
 
         btnClear = new JButton("Clear");
-        btnClear.setBounds(20, 160, SCREEN_WIDTH/3, 30);
-
         btnLogin = new JButton("Login");
-        btnLogin.setBounds(SCREEN_WIDTH/3 + 65, 160, SCREEN_WIDTH/3, 30);
 
-        add(lblHeading);
-        add(lblUserId);
-        add(lblPassword);
-        add(txtUserId);
-        add(txtPassword);
-        add(btnClear);
-        add(btnLogin);
+        // Heading
+        panelHeading.add(Box.createRigidArea(new Dimension(COMP_GAP, 0))); // Horizontal gap
+        panelHeading.add(lblHeading);
+        panelHeading.add(Box.createRigidArea(new Dimension(COMP_GAP, 0))); // Horizontal gap
+
+        // Username
+        panelUserName.add(Box.createRigidArea(new Dimension(COMP_GAP, 0))); // Horizontal gap
+        panelUserName.add(lblUserId);
+        panelUserName.add(Box.createRigidArea(new Dimension(COMP_GAP, 0))); // Horizontal gap
+        panelUserName.add(txtUserId);
+        panelUserName.add(Box.createRigidArea(new Dimension(COMP_GAP, 0))); // Horizontal gap
+
+        // Password
+        panelPassword.add(Box.createRigidArea(new Dimension(COMP_GAP, 0))); // Horizontal gap
+        panelPassword.add(lblPassword);
+        panelPassword.add(Box.createRigidArea(new Dimension(COMP_GAP, 0))); // Horizontal gap
+        panelPassword.add(txtPassword);
+        panelPassword.add(Box.createRigidArea(new Dimension(COMP_GAP, 0))); // Horizontal gap
+
+        // Buttons
+        panelControls.add(Box.createRigidArea(new Dimension(COMP_GAP, 0))); // Horizontal gap
+        panelControls.add(btnClear);
+        panelControls.add(Box.createRigidArea(new Dimension(COMP_GAP, 0))); // Horizontal gap
+        panelControls.add(btnLogin);
+        panelControls.add(Box.createRigidArea(new Dimension(COMP_GAP, 0))); // Horizontal gap
+
+        this.setLayout(new BoxLayout(getContentPane(), BoxLayout.PAGE_AXIS)); // JFrame's layout
+        add(Box.createRigidArea(new Dimension(new Dimension(0, COMP_GAP)))); // Vertical gap
+        add(panelHeading);
+        add(Box.createRigidArea(new Dimension(new Dimension(0, COMP_GAP)))); // Vertical gap
+        add(panelUserName);
+        add(Box.createRigidArea(new Dimension(new Dimension(0, COMP_GAP)))); // Vertical gap
+        add(panelPassword);
+        add(Box.createRigidArea(new Dimension(new Dimension(0, COMP_GAP)))); // Vertical gap
+        add(panelControls);
+        add(Box.createRigidArea(new Dimension(new Dimension(0, COMP_GAP)))); // Vertical gap
     }
 }
