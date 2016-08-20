@@ -1,6 +1,9 @@
 package com.pass;
 
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.*;
 
 
@@ -11,7 +14,7 @@ public class Main {
     }
 }
 
-class LoginWindow extends JFrame {
+class LoginWindow extends JFrame implements ActionListener {
     // Constants
     private final int SCREEN_POS_X = 500;
     private final int SCREEN_POS_Y = 250;
@@ -31,6 +34,7 @@ class LoginWindow extends JFrame {
         setMinimumSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
 
         addComponents();
+        addListeners();
         setVisible(true);
     }
 
@@ -97,5 +101,35 @@ class LoginWindow extends JFrame {
         add(Box.createRigidArea(new Dimension(new Dimension(0, COMP_GAP)))); // Vertical gap
         add(panelControls);
         add(Box.createRigidArea(new Dimension(new Dimension(0, COMP_GAP)))); // Vertical gap
+    }
+
+    private void addListeners() {
+        /*
+        * Notice! 'this' object is being looked at as an ActionListener
+        * It's actually a JFrame. This is how interfaces encapsulate data.
+        * The JButtons receiving the object can only access the actionPerformed() method
+        * i.e. Sharing required functionality without exposing all class fields.
+        */
+        btnLogin.addActionListener(this);
+        btnClear.addActionListener(this);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        // Switch-Case is better than IF-ELSE
+        switch (e.getActionCommand()) {
+            case "Clear":
+                txtPassword.setText("");
+                txtUserId.setText("");
+                break;
+            case "Login":
+                // Create a test JFrame and display
+                JFrame newWindow = new JFrame("Test Window");
+                newWindow.setBounds(SCREEN_POS_X, SCREEN_POS_Y, SCREEN_WIDTH, SCREEN_HEIGHT / 2);
+                newWindow.setVisible(true);
+                break;
+            default:
+                break; // Do nothing here. But having a default condition is good practice
+        }
     }
 }
