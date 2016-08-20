@@ -14,7 +14,7 @@ public class Main {
     }
 }
 
-class LoginWindow extends JFrame implements ActionListener {
+class LoginWindow extends JFrame {
     // Constants
     private final int SCREEN_POS_X = 500;
     private final int SCREEN_POS_Y = 250;
@@ -105,31 +105,32 @@ class LoginWindow extends JFrame implements ActionListener {
 
     private void addListeners() {
         /*
-        * Notice! 'this' object is being looked at as an ActionListener
-        * It's actually a JFrame. This is how interfaces encapsulate data.
-        * The JButtons receiving the object can only access the actionPerformed() method
-        * i.e. Sharing required functionality without exposing all class fields.
+        * This is the recommended way to implement EventListeners using Anonymous classes
+        * An Anonymous class is simply a class without a name and reference. There is
+        * * no way access it or change. It's simply used to inject functionality into other objects
+        * * They behave just like an inner class and can be replaced if functionality needs to be shared
+        * * For e.g. if we had two buttons doing the exact same thing
+        *
+        * The first button implements them normally
+        * The second button uses a lambda expression to inject the same functionality
+        * * And as the syntax indicates, no object is being created in this case
+        * * It's behaving more like assigning a delegate (only provides a method instead of an object)
+        * * Lambda injection is only useful when the interface only has a single method
         */
-        btnLogin.addActionListener(this);
-        btnClear.addActionListener(this);
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        // Switch-Case is better than IF-ELSE
-        switch (e.getActionCommand()) {
-            case "Clear":
-                txtPassword.setText("");
-                txtUserId.setText("");
-                break;
-            case "Login":
+        btnLogin.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
                 // Create a test JFrame and display
                 JFrame newWindow = new JFrame("Test Window");
                 newWindow.setBounds(SCREEN_POS_X, SCREEN_POS_Y, SCREEN_WIDTH, SCREEN_HEIGHT / 2);
                 newWindow.setVisible(true);
-                break;
-            default:
-                break; // Do nothing here. But having a default condition is good practice
-        }
+            }
+        });
+
+        // Lambda expressions require Language level 8 or above
+        btnClear.addActionListener(e -> {
+            txtPassword.setText("");
+            txtUserId.setText("");
+        });
     }
 }
