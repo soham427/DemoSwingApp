@@ -15,18 +15,21 @@ public class Main {
 }
 
 class LoginWindow extends JFrame {
+    public static final String FILE_STORAGE_PATH = "user_record.bin";
     // Constants
     private final int SCREEN_POS_X = 500;
     private final int SCREEN_POS_Y = 250;
     private final int SCREEN_WIDTH = 300;
-    private final int SCREEN_HEIGHT = 280;
+    private final int SCREEN_HEIGHT = 320;
     private final int COMP_GAP = 30;
+    private final String[] CMB_OPTIONS = new String[]{"User", "Admin", "Super User", "God"};
 
     // Components
     private JButton btnClear, btnLogin;
     private JLabel lblHeading, lblUserId, lblPassword;
+    private JComboBox cmbRoles;
     private JTextField txtUserId, txtPassword;
-    private JPanel panelHeading, panelUserName, panelPassword, panelControls;
+    private JPanel panelHeading, panelUserName, panelPassword, panelControls, panelComboBox;
 
     LoginWindow(String title) {
         setTitle(title);
@@ -47,10 +50,12 @@ class LoginWindow extends JFrame {
         panelHeading.setLayout(new BoxLayout(panelHeading, BoxLayout.LINE_AXIS));
         panelUserName = new JPanel();
         panelUserName.setLayout(new BoxLayout(panelUserName, BoxLayout.LINE_AXIS));
-        panelPassword =  new JPanel();
+        panelPassword = new JPanel();
         panelPassword.setLayout(new BoxLayout(panelPassword, BoxLayout.LINE_AXIS));
         panelControls = new JPanel();
         panelControls.setLayout(new BoxLayout(panelControls, BoxLayout.LINE_AXIS));
+        panelComboBox = new JPanel();
+        panelComboBox.setLayout(new BoxLayout(panelComboBox, BoxLayout.LINE_AXIS));
 
         lblHeading = new JLabel("Enter Password", SwingConstants.CENTER);
 
@@ -61,6 +66,8 @@ class LoginWindow extends JFrame {
         txtUserId.setMaximumSize(new Dimension(COMP_GAP * 3, COMP_GAP));
         txtPassword = new JPasswordField();
         txtPassword.setMaximumSize(new Dimension(COMP_GAP * 3, COMP_GAP));
+
+        cmbRoles = new JComboBox<>(CMB_OPTIONS);
 
         btnClear = new JButton("Clear");
         btnLogin = new JButton("Login");
@@ -84,6 +91,11 @@ class LoginWindow extends JFrame {
         panelPassword.add(txtPassword);
         panelPassword.add(Box.createRigidArea(new Dimension(COMP_GAP, 0))); // Horizontal gap
 
+        // ComboBox
+        panelComboBox.add(Box.createRigidArea(new Dimension(COMP_GAP, 0))); // Horizontal gap
+        panelComboBox.add(cmbRoles);
+        panelComboBox.add(Box.createRigidArea(new Dimension(COMP_GAP, 0))); // Horizontal gap
+
         // Buttons
         panelControls.add(Box.createRigidArea(new Dimension(COMP_GAP, 0))); // Horizontal gap
         panelControls.add(btnClear);
@@ -98,6 +110,8 @@ class LoginWindow extends JFrame {
         add(panelUserName);
         add(Box.createRigidArea(new Dimension(new Dimension(0, COMP_GAP)))); // Vertical gap
         add(panelPassword);
+        add(Box.createRigidArea(new Dimension(new Dimension(0, COMP_GAP)))); // Vertical gap
+        add(panelComboBox);
         add(Box.createRigidArea(new Dimension(new Dimension(0, COMP_GAP)))); // Vertical gap
         add(panelControls);
         add(Box.createRigidArea(new Dimension(new Dimension(0, COMP_GAP)))); // Vertical gap
@@ -120,8 +134,47 @@ class LoginWindow extends JFrame {
         btnLogin.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Create a test JFrame and display
-                JFrame newWindow = new JFrame("Test Window");
+                // Load user record from disk
+                UserRecord userRecord = null;
+                try {
+                    userRecord = (UserRecord) PersistenceManager.loadObject(FILE_STORAGE_PATH);
+                    // Check if no file was returned; implies the file probably does not exists
+                    if (userRecord == null) {
+                        // So create it
+                        PersistenceManager.storeObject(new UserRecord(0, 0, 0, 0), FILE_STORAGE_PATH);
+                        userRecord = (UserRecord) PersistenceManager.loadObject(FILE_STORAGE_PATH);
+                    }
+                } catch (Exception ex) {
+                    System.out.println(ex.getMessage());
+                    return; // exit to avoid further nullpointers
+                }
+
+                // Find selected item in the comboBox and update user-record
+                switch (cmbRoles.getSelectedItem().toString()) {
+                    case "User":
+                        userRecord.userCount++;
+                        break;
+                    case "Admin":
+                        userRecord.adminCount++;
+                        break;
+                    case "Super User":
+                        userRecord.superUserCount++;
+                        break;
+                    case "God":
+                        userRecord.godCount++;
+                        break;
+                }
+                /*
+                * Store the record back!
+                * Here we are trying to naively implement separation of concern.
+                * Both Window classes (first of should never worry about any non-GUI logic)
+                * are simple reading and writing from the disk to access the record data.
+                * They are not dependent on each other.
+                */
+                PersistenceManager.storeObject(userRecord, FILE_STORAGE_PATH);
+
+                // Create a new window and display
+                RecordWindow newWindow = new RecordWindow(SCREEN_POS_X, SCREEN_POS_Y, SCREEN_WIDTH, SCREEN_HEIGHT, "Login Records");
                 newWindow.setBounds(SCREEN_POS_X, SCREEN_POS_Y, SCREEN_WIDTH, SCREEN_HEIGHT / 2);
                 newWindow.setVisible(true);
             }
