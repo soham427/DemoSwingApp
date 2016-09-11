@@ -5,10 +5,10 @@ import java.awt.Dimension;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
+import javax.swing.JScrollPane;
 
 public class RecordWindow extends JFrame {
-    private JLabel lblUser, lblAdmin, lblSu, lblGod;
+    private RecordTable recordTable;
     private final int COMP_GAP = 30;
 
     public RecordWindow(int pos_x, int pos_y, int width, int height, String title) {
@@ -23,20 +23,11 @@ public class RecordWindow extends JFrame {
 
     // Add JComponents to the window
     private void addComponents() {
-        lblUser = new JLabel("User: ");
-        lblAdmin = new JLabel("Admin: ");
-        lblSu = new JLabel("Super User: ");
-        lblGod = new JLabel("God: ");
+        recordTable = new RecordTable();
 
         this.setLayout(new BoxLayout(getContentPane(), BoxLayout.PAGE_AXIS)); // JFrame's layout
         add(Box.createRigidArea(new Dimension(new Dimension(COMP_GAP, COMP_GAP)))); // Gap
-        add(lblUser);
-        add(Box.createRigidArea(new Dimension(new Dimension(COMP_GAP, COMP_GAP)))); // Gap
-        add(lblAdmin);
-        add(Box.createRigidArea(new Dimension(new Dimension(COMP_GAP, COMP_GAP)))); // Gap
-        add(lblSu);
-        add(Box.createRigidArea(new Dimension(new Dimension(COMP_GAP, COMP_GAP)))); // Gap
-        add(lblGod);
+        add(new JScrollPane(recordTable));
         add(Box.createRigidArea(new Dimension(new Dimension(COMP_GAP, COMP_GAP)))); // Gap
     }
 
@@ -53,11 +44,11 @@ public class RecordWindow extends JFrame {
             return; // exit to avoid further nullpointers
         }
 
+        // Update table
+        recordTable.addRow(new Object[] {"User", userRecord.userCount});
+        recordTable.addRow(new Object[] {"Admin", userRecord.adminCount});
+        recordTable.addRow(new Object[] {"Super User", userRecord.superUserCount});
+        recordTable.addRow(new Object[] {"God", userRecord.godCount});
 
-        // Update labels
-        lblUser.setText(lblUser.getText() + userRecord.userCount);
-        lblAdmin.setText(lblAdmin.getText() + userRecord.adminCount);
-        lblSu.setText(lblSu.getText() + userRecord.superUserCount);
-        lblGod.setText(lblGod.getText() + userRecord.godCount);
     }
 }
