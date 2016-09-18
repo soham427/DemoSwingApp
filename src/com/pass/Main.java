@@ -3,6 +3,8 @@ package com.pass;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.*;
 
@@ -14,7 +16,7 @@ public class Main {
     }
 }
 
-class LoginWindow extends JFrame {
+class LoginWindow extends JFrame implements Observable {
     public static final String FILE_STORAGE_PATH = "user_record.bin";
     // Constants
     private final int SCREEN_POS_X = 500;
@@ -30,11 +32,14 @@ class LoginWindow extends JFrame {
     private JComboBox cmbRoles;
     private JTextField txtUserId, txtPassword;
     private JPanel panelHeading, panelUserName, panelPassword, panelControls, panelComboBox;
+    private List<Observer> openedRecordWindows;
 
     LoginWindow(String title) {
         setTitle(title);
         setBounds(SCREEN_POS_X, SCREEN_POS_Y, SCREEN_WIDTH, SCREEN_HEIGHT);
         setMinimumSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
+
+        openedRecordWindows = new ArrayList<>();
 
         addComponents();
         addListeners();
@@ -174,9 +179,10 @@ class LoginWindow extends JFrame {
                 PersistenceManager.storeObject(userRecord, FILE_STORAGE_PATH);
 
                 // Create a new window and display
-                RecordWindow newWindow = new RecordWindow(SCREEN_POS_X, SCREEN_POS_Y, SCREEN_WIDTH, SCREEN_HEIGHT, "Login Records");
+                RecordWindow newWindow = new RecordWindow(SCREEN_POS_X, SCREEN_POS_Y, SCREEN_WIDTH, SCREEN_HEIGHT, "Login Records", getThis());
                 newWindow.setBounds(SCREEN_POS_X, SCREEN_POS_Y, SCREEN_WIDTH, SCREEN_HEIGHT / 2);
                 newWindow.setVisible(true);
+                openedRecordWindows.add(newWindow);
             }
         });
 
@@ -185,5 +191,18 @@ class LoginWindow extends JFrame {
             txtPassword.setText("");
             txtUserId.setText("");
         });
+    }
+
+    // Helper method to allow getting a parent instance inside the anonymous ActionListener implementation
+    // Use with CAUTION
+    private LoginWindow getThis() {
+        return this;
+    }
+
+    @Override
+    public void notifyAllObservers() {
+        for (Observer observer : openedRecordWindows) {
+            observer.update();
+        }
     }
 }

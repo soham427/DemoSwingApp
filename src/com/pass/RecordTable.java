@@ -17,4 +17,9 @@ public class RecordTable extends JTable {
         }
         lastAddedRow++;
     }
+
+    // Challenge: Refactor to avoid repeating code
+    public void resetRowCounter() {
+        lastAddedRow = 0;
+    }
 }
